@@ -1,3 +1,16 @@
+const tableSeasons = document.querySelector('.seasons');
+const body = document.querySelector('.stats');
+
+const getSeasons = async (championship) => {
+  const url = `https://api-football-standings.azharimm.site/leagues/${championship}/seasons` 
+  fetch(url)
+  .then(response => response.json())
+  .then(data => getLeagueSeasons(data))
+  .catch(err => {
+    console.error(err);
+  });
+} 
+
 const getLeagues = (league, year) => {
   const url = `https://api-football-standings.azharimm.site/leagues/${league}/standings?season=${year}&sort=asc` 
 	return fetch(url)
@@ -6,23 +19,65 @@ const getLeagues = (league, year) => {
     .catch((error) => console.error(error));
 }
 
-// async function showStanding(val1, val2) {
-//   const request = await getLeagues(val1, val2);
-//   const { data } = request;
-//   console.log(request);
-// }
 
-// async function createStandings(league, click) {
-//   const getYear = document.querySelector('.')
-//   const request = await getLeagues(league, getYear);
-//   const standing = request.standings.map 
-// }
+function clickListener(event) {
+  const selected = event.target.innerHTML;
+  console.log(selected);
+}
 
-// const getChampionship = (league) => {
-//   const teams = Array.from(league)
-//   teams.forEach((team) => {
-//     console.log(team)
-//   })
-// }
+const getLeagueSeasons = (league) => {
+  const seasons = league.data.seasons;
+  const row = document.createElement('tr');
+  const leagueName = document.createElement('th');
+  leagueName.innerHTML = league.data.name;
+  row.appendChild(leagueName)
+  tableSeasons.appendChild(row)
+  seasons.forEach((season) => {
+    const rowElement = document.createElement('td');
+    rowElement.innerHTML = season.year;
+    row.appendChild(rowElement)
+    tableSeasons.appendChild(row)
+    rowElement.addEventListener('click', clickListener);
+  });
+}
 
-showStanding('eng.1', '2020');
+function createRows() {
+  for(let i = 0; i < 20; i += 1) {
+    const rows = document.createElement('tr');
+    rows.className = 'linhas';
+    body.appendChild(rows);
+  }
+}
+createRows();
+
+function createTable(status) {
+  const header = document.querySelector('.values');
+  const column = document.createElement('th');
+  column.innerHTML = status;
+  header.appendChild(column);
+}
+
+function createBody(values) {
+  console.log(values);
+  const getRows = document.getElementsByClassName('linhas');
+  values.forEach((value) => {
+    const info = document.createElement('td');
+    info.innerHTML = value;
+    getRows.appendChild(info);
+  })
+}
+
+async function createStandings(league, getYear) {
+  const request = await getLeagues(league, getYear);
+  const standings = request['data'].standings;
+  standings[0].stats.forEach((stat) => createTable(stat.displayName));
+  standings.map((element) => {
+    console.log(element);
+    createBody(element.stats);
+    // element.stats.forEach((stat) => createBody(stat.displayValue));
+  });
+}
+
+getSeasons('eng.1');
+createStandings('eng.1', '2020');
+console.log(getLeagues('eng.1', '2020'));
