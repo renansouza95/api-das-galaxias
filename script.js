@@ -20,9 +20,14 @@ const getLeagueSeasons = (league) => {
   seasons.forEach((season) => {
     const rowElement = document.createElement('td');
     rowElement.innerHTML = season.year;
+    rowElement.className = 'yearSeason'
+    rowElement.addEventListener('click', functionTest())
     row.appendChild(rowElement)
     table.appendChild(row)
   });
 }
 
+const functionTest = () => {
+  console.log('teste')
+}
 getSeasons('arg.1')
