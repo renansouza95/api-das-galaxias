@@ -1,5 +1,6 @@
 const tableSeasons = document.querySelector('.seasons');
 const body = document.querySelector('.stats');
+let array = [];
 
 const getSeasons = async (championship) => {
   const url = `https://api-football-standings.azharimm.site/leagues/${championship}/seasons` 
@@ -35,22 +36,20 @@ const getLeagueSeasons = (league) => {
   seasons.forEach((season) => {
     const rowElement = document.createElement('td');
     rowElement.innerHTML = season.year;
-    rowElement.className = 'yearSeason'
-    rowElement.addEventListener('click', functionTest())
     row.appendChild(rowElement)
     tableSeasons.appendChild(row)
     rowElement.addEventListener('click', clickListener);
   });
 }
 
-function createRows() {
-  for(let i = 0; i < 20; i += 1) {
-    const rows = document.createElement('tr');
-    rows.className = 'linhas';
-    body.appendChild(rows);
-  }
-}
-createRows();
+// function createRows() {
+//   for(let i = 0; i < 20; i += 1) {
+//     const rows = document.createElement('tr');
+//     rows.className = 'linhas';
+//     body.appendChild(rows);
+//   }
+// }
+// createRows();
 
 function createTable(status) {
   const header = document.querySelector('.values');
@@ -59,13 +58,25 @@ function createTable(status) {
   header.appendChild(column);
 }
 
-function createBody(values) {
-  console.log(values);
-  const getRows = document.getElementsByClassName('linhas');
-  values.forEach((value) => {
-    const info = document.createElement('td');
-    info.innerHTML = value;
-    getRows.appendChild(info);
+function createTeamsTable(values) {
+  const rows = document.createElement('tr');
+  rows.className = values.replace(/\s+/g, '')
+  const team = document.createElement('td');
+  team.innerHTML = values;
+  rows.appendChild(team)
+  body.appendChild(rows)
+}
+
+function getStandings(team) {
+  const teams = document.querySelectorAll('tr')
+  Array.from(teams).map((teamRow) => {
+    if(teamRow.className === team.team.name.replace(/\s+/g, '')) {
+      team.stats.forEach((stat) => {
+        const standings = document.createElement('td');
+        standings.innerHTML = stat.displayValue;
+        teamRow.appendChild(standings)
+      })
+    }
   })
 }
 
@@ -74,15 +85,12 @@ async function createStandings(league, getYear) {
   const standings = request['data'].standings;
   standings[0].stats.forEach((stat) => createTable(stat.displayName));
   standings.map((element) => {
-    console.log(element);
-    createBody(element.stats);
-    // element.stats.forEach((stat) => createBody(stat.displayValue));
+    createTeamsTable(element.team.name)
+    console.log(element)
+    getStandings(element)
   });
 }
 
-const functionTest = () => {
-  console.log('teste')
-}
 getSeasons('eng.1');
 createStandings('eng.1', '2020');
 console.log(getLeagues('eng.1', '2020'));
